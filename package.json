@@ -1,0 +1,33 @@
+{
+  "name": "ultimatecourses-rxjsbasics",
+  "version": "1.0.0",
+  "description": "Coursework",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mahertim/UltimateCourses-RxJSBasics.git"
+  },
+  "keywords": [
+    "typescript",
+    "rxjs"
+  ],
+  "devDependencies": {
+    "awesome-typescript-loader": "3.4.1",
+    "typescript": "2.6.2",
+    "webpack": "3.10.0",
+    "webpack-dev-server": "2.9.7"
+  },
+  "author": "Tim Maher",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/mahertim/UltimateCourses-RxJSBasics/issues"
+  },
+  "homepage": "https://github.com/mahertim/UltimateCourses-RxJSBasics",
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
+}

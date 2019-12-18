@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    /**** BEGIN BASIC SETUP ****/
+    "target": "es5",
+    "module": "commonjs",
+    "lib": ["dom", "es6"],
+    "outDir": "dist",
+    "strict": true,
+    /**** END BASIC SETUP ****/
+
+    /**** BEGIN EMIT OPTIONS ****/
+    "noEmitOnError": true, // no output on error
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true, // needed for angular
+    /**** END EMIT OPTIONS ****/
+
+    /**** BEGIN CONSOLE OUTPUT ****/
+    // "diagnostics": true, // Logs diagnostic info such as compile time
+    "pretty": true, // Colorizes and prettifies compile errors
+    /**** END CONSOLE OUTPUT ****/
+
+    /**** BEGIN CODE QUALITY ****/
+    "noUnusedLocals": true, // Causes unused locals to error
+    "noUnusedParameters": true, // Causes unused parameters to error
+    "noFallthroughCasesInSwitch": true, // Causes an error when it is possible to fallthrough a switch
+    "noImplicitReturns": true, // Causes code paths that never return to error
+    /**** END CODE QUALITY ****/
+
+    // Import helper functions such as __extends from tslib (tslib must be in package)
+    // Better version of noEmitHelpers because it ensures that the helper functions exist
+    "importHelpers": true
+  }
+}

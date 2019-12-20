@@ -7,17 +7,22 @@ const observer = {
 };
 
 const observable = new Observable((subscriber: any) => {
-  subscriber.next('hello');
-  subscriber.next('world');
-  subscriber.complete();
-  subscriber.next('hello'); // not reached because the observable has completed
-  subscriber.next('world'); // not reached because the observable has completed
+  let count = 0;
+
+  const id = setInterval(() => {
+    subscriber.next(count);
+    if (count >= 20) {
+      subscriber.complete();
+    }
+    count++;
+  }, 1000);
+
+  return () => {
+    console.log('called');
+    clearInterval(id);
+  };
 });
 
 console.log('before');
 observable.subscribe(observer);
-console.log('after');
-
-console.log('before');
-observable.subscribe((value: any) => console.log('next', value));
 console.log('after');

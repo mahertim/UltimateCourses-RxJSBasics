@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
     /**** BEGIN BASIC SETUP ****/
-    "target": "es5",
-    "module": "commonjs",
+    "target": "es6",
+    "module": "es6",
     "lib": ["dom", "es6"],
     "outDir": "dist",
     "strict": true,
+    "moduleResolution": "node",
     /**** END BASIC SETUP ****/
 
     /**** BEGIN EMIT OPTIONS ****/

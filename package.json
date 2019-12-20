@@ -28,6 +28,8 @@
   },
   "homepage": "https://github.com/mahertim/UltimateCourses-RxJSBasics",
   "dependencies": {
+    "@types/rx-dom": "^7.0.0",
+    "rxjs": "6.0.0",
     "tslib": "^1.10.0"
   }
 }

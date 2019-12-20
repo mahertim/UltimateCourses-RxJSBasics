@@ -11,9 +11,6 @@ const observable = new Observable((subscriber: any) => {
 
   const id = setInterval(() => {
     subscriber.next(count);
-    if (count >= 20) {
-      subscriber.complete();
-    }
     count++;
   }, 1000);
 
@@ -24,5 +21,13 @@ const observable = new Observable((subscriber: any) => {
 });
 
 console.log('before');
-observable.subscribe(observer);
+const subscription = observable.subscribe(observer);
+const subscription2 = observable.subscribe(observer);
 console.log('after');
+
+subscription.add(subscription2); // allows us to unsub both at once
+setTimeout(() => {
+  // calls the cleanup method we returned from subscribe method
+  // does not fire complete()
+  subscription.unsubscribe();
+}, 3500);

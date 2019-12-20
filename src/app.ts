@@ -14,4 +14,10 @@ const observable = new Observable((subscriber: any) => {
   subscriber.next('world'); // not reached because the observable has completed
 });
 
+console.log('before');
 observable.subscribe(observer);
+console.log('after');
+
+console.log('before');
+observable.subscribe((value: any) => console.log('next', value));
+console.log('after');

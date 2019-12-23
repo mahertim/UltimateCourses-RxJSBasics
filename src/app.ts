@@ -25,7 +25,7 @@ const subscription = observable.subscribe(observer);
 const subscription2 = observable.subscribe(observer);
 console.log('after');
 
-subscription.add(subscription2); // allows us to unsub both at once
+subscription.add(subscription2); // allows us to unsubscribe both at once
 setTimeout(() => {
   // calls the cleanup method we returned from subscribe method
   // does not fire complete()

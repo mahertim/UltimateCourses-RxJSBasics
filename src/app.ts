@@ -1,18 +1,19 @@
-import { Observable, of, from, fromEvent, interval } from 'rxjs';
+import { Observable, fromEvent } from 'rxjs';
 
-// create observable from a stream
-const streamObs: Observable<String> = of('https://some.api.url/');
+const source$: Observable<Event> = fromEvent(document, 'keyup');
 
-// create observable from an array
-const arrayObs: Observable<number> = from([1, 2, 3, 4, 5]);
+const observer = {
+  next: (val: Event) => console.log('next', val),
+  error: (val: Event) => console.log('error', val),
+  complete: () => console.log('complete'),
+};
 
-// create observable from dom event
-const domObs: Observable<Event> = fromEvent(document, 'click');
+const subOne = source$.subscribe(observer);
+const subTwo = source$.subscribe(observer);
 
-// set up the emission of values at an interval
-const intervalObs: Observable<number> = interval(1000);
+setTimeout(() => {
+  console.log('unsubscribing');
+  subOne.unsubscribe();
+}, 3000);
 
-console.log(streamObs);
-console.log(arrayObs);
-console.log(domObs);
-console.log(intervalObs);
+console.log(subTwo);

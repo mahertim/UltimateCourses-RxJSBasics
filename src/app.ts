@@ -1,19 +1,15 @@
-import { Observable, fromEvent } from 'rxjs';
-
-const source$: Observable<Event> = fromEvent(document, 'keyup');
+import { range, of } from 'rxjs';
 
 const observer = {
-  next: (val: Event) => console.log('next', val),
-  error: (val: Event) => console.log('error', val),
+  next: (val: any) => console.log('next', val),
+  error: (val: any) => console.log('error', val),
   complete: () => console.log('complete'),
 };
 
-const subOne = source$.subscribe(observer);
-const subTwo = source$.subscribe(observer);
+const source$ = of(1, 2, 3, 4, 5);
 
-setTimeout(() => {
-  console.log('unsubscribing');
-  subOne.unsubscribe();
-}, 3000);
+source$.subscribe(observer);
 
-console.log(subTwo);
+const anotherSource$ = range(1, 5);
+
+anotherSource$.subscribe(observer);

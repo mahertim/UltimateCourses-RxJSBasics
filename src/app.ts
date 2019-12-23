@@ -1,33 +1,18 @@
-import { Observable } from 'rxjs';
+import { Observable, of, from, fromEvent, interval } from 'rxjs';
 
-const observer = {
-  next: (value: any) => console.log('next', value),
-  error: (error: any) => console.log('error', error),
-  complete: () => console.log('complete!'),
-};
+// create observable from a stream
+const streamObs: Observable<String> = of('https://some.api.url/');
 
-const observable = new Observable((subscriber: any) => {
-  let count = 0;
+// create observable from an array
+const arrayObs: Observable<number> = from([1, 2, 3, 4, 5]);
 
-  const id = setInterval(() => {
-    subscriber.next(count);
-    count++;
-  }, 1000);
+// create observable from dom event
+const domObs: Observable<Event> = fromEvent(document, 'click');
 
-  return () => {
-    console.log('called');
-    clearInterval(id);
-  };
-});
+// set up the emission of values at an interval
+const intervalObs: Observable<number> = interval(1000);
 
-console.log('before');
-const subscription = observable.subscribe(observer);
-const subscription2 = observable.subscribe(observer);
-console.log('after');
-
-subscription.add(subscription2); // allows us to unsubscribe both at once
-setTimeout(() => {
-  // calls the cleanup method we returned from subscribe method
-  // does not fire complete()
-  subscription.unsubscribe();
-}, 3500);
+console.log(streamObs);
+console.log(arrayObs);
+console.log(domObs);
+console.log(intervalObs);

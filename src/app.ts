@@ -1,26 +1,17 @@
-import { interval } from 'rxjs';
-import { scan, mapTo, filter } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
-// elements
-const countdown = document.getElementById('countdown');
-const message = document.getElementById('message');
+const numbers$ = of(1, 2, 3, 4, 5);
 
-const counter$ = interval(1000);
-
-counter$
+numbers$
   .pipe(
-    mapTo(-1),
-    scan((accumulator, current) => {
-      return accumulator + current;
-    }, 10),
-    filter(value => value >= 0),
+    tap(value => console.log('before', value)),
+    map(value => value * 10),
+    tap({
+      next: value => console.log('after', value),
+      complete: () => console.log('done!'),
+    }),
   )
   .subscribe(value => {
-    console.log(value);
-    if (countdown instanceof HTMLElement) {
-      countdown.innerHTML = value.toString();
-    }
-    if (!value && message instanceof HTMLElement) {
-      message.innerHTML = 'Liftoff!';
-    }
+    console.log('from subscribe', value);
   });

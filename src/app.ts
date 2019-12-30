@@ -1,30 +1,15 @@
-import { fromEvent } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { interval } from 'rxjs';
+import { reduce, take } from 'rxjs/operators';
 
-// helpers
-function calculateScrollPercent(element: {
-  scrollTop: any;
-  scrollHeight: any;
-  clientHeight: any;
-}) {
-  const { scrollTop, scrollHeight, clientHeight } = element;
+// const numbers = [1, 2, 3, 4, 5];
 
-  return (scrollTop / (scrollHeight - clientHeight)) * 100;
-}
+const totalReducer = (accumulator: number, currentValue: number) => {
+  return accumulator + currentValue;
+};
 
-// elements
-const progressBar = document.querySelector('.progress-bar');
-
-// streams
-const scroll$ = fromEvent(document, 'scroll');
-const progress$ = scroll$.pipe(
-  // percent progress
-  map(({ target }: any) => calculateScrollPercent(target.documentElement)),
-);
-
-progress$.subscribe(percent => {
-  if (progressBar instanceof HTMLElement) {
-    console.log(percent);
-    progressBar.style.width = `${percent}%`;
-  }
-});
+interval(1000)
+  .pipe(take(3), reduce(totalReducer, 0))
+  .subscribe({
+    next: console.log,
+    complete: () => console.log('complete'),
+  });

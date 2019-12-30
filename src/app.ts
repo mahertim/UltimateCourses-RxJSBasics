@@ -1,28 +1,13 @@
-import { Observable, fromEvent } from 'rxjs';
-import { map, pluck, mapTo } from 'rxjs/operators';
+import { of, fromEvent } from 'rxjs';
+import { filter, pluck } from 'rxjs/operators';
 
-// of(1, 2, 3, 4, 5)
-//   .pipe(map(value => value * 10))
-//   .subscribe(console.log);
+of(1, 2, 3, 4, 5)
+  .pipe(filter(value => value > 2))
+  .subscribe(console.log);
 
-const keyup$: Observable<Event> = fromEvent(document, 'keyup');
+const keyup$ = fromEvent(document, 'keyup');
+const keycode$ = keyup$.pipe(pluck('code'));
+const enter$ = keycode$.pipe(filter(code => code == 'Enter'));
 
-const keycode$ = keyup$.pipe(
-  map(event => {
-    if (event instanceof KeyboardEvent) {
-      return event.key;
-    } else {
-      return 'err';
-    }
-  }),
-);
-
-const keycodeWithPluck$ = keyup$.pipe(pluck('code'));
-
-const pressed$ = keyup$.pipe(mapTo('Key Pressed'));
-
+enter$.subscribe(console.log);
 keycode$.subscribe(console.log);
-
-keycodeWithPluck$.subscribe(console.log);
-
-pressed$.subscribe(console.log);

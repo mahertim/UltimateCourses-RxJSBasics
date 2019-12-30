@@ -1,13 +1,30 @@
-import { of, fromEvent } from 'rxjs';
-import { filter, pluck } from 'rxjs/operators';
+import { fromEvent } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-of(1, 2, 3, 4, 5)
-  .pipe(filter(value => value > 2))
-  .subscribe(console.log);
+// helpers
+function calculateScrollPercent(element: {
+  scrollTop: any;
+  scrollHeight: any;
+  clientHeight: any;
+}) {
+  const { scrollTop, scrollHeight, clientHeight } = element;
 
-const keyup$ = fromEvent(document, 'keyup');
-const keycode$ = keyup$.pipe(pluck('code'));
-const enter$ = keycode$.pipe(filter(code => code == 'Enter'));
+  return (scrollTop / (scrollHeight - clientHeight)) * 100;
+}
 
-enter$.subscribe(console.log);
-keycode$.subscribe(console.log);
+// elements
+const progressBar = document.querySelector('.progress-bar');
+
+// streams
+const scroll$ = fromEvent(document, 'scroll');
+const progress$ = scroll$.pipe(
+  // percent progress
+  map(({ target }: any) => calculateScrollPercent(target.documentElement)),
+);
+
+progress$.subscribe(percent => {
+  if (progressBar instanceof HTMLElement) {
+    console.log(percent);
+    progressBar.style.width = `${percent}%`;
+  }
+});

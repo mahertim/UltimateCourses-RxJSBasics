@@ -1,27 +1,12 @@
-import { interval } from 'rxjs';
-import { sampleTime, throttleTime, debounceTime } from 'rxjs/operators';
-
-// elements
-const timer = document.getElementById('timer') as HTMLElement;
-const debouncer = document.getElementById('debouncer') as HTMLElement;
-const throttler = document.getElementById('throttler') as HTMLElement;
-const sampler = document.getElementById('sampler') as HTMLElement;
+import { fromEvent, asyncScheduler } from 'rxjs';
+import { auditTime, throttleTime } from 'rxjs/operators';
 
 // streams
-const timer$ = interval(1000);
-const debouncer$ = timer$.pipe(debounceTime(500));
-const throttler$ = timer$.pipe(throttleTime(2000));
-const sampler$ = timer$.pipe(sampleTime(2000));
+const click$ = fromEvent(document, 'click');
 
-timer$.subscribe(tick => {
-  timer.innerHTML = `Timer: ${tick}`;
-});
-debouncer$.subscribe(tick => {
-  debouncer.innerHTML = `Debouncer: ${tick}`;
-});
-throttler$.subscribe(tick => {
-  throttler.innerHTML = `Throttler: ${tick}`;
-});
-sampler$.subscribe(tick => {
-  sampler.innerHTML = `Sampler: ${tick}`;
-});
+// these act the same
+// auditTime(500) == throttleTime(500, asyncScheduler, { leading: false, trailing: true })
+click$
+  .pipe(throttleTime(4000, asyncScheduler, { leading: false, trailing: true }))
+  .subscribe(console.log);
+click$.pipe(auditTime(4000)).subscribe(console.log);

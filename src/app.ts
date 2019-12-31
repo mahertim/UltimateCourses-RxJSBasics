@@ -1,29 +1,14 @@
-import { from } from 'rxjs';
-import { scan, map, distinctUntilKeyChanged } from 'rxjs/operators';
+import { fromEvent } from 'rxjs';
+import { debounceTime, pluck, distinctUntilChanged } from 'rxjs/operators';
 
-class User {
-  constructor(
-    public name: string = '',
-    public loggedIn: boolean = false,
-    public token: string | null = null,
-  ) {}
-}
+// elements
+const inputBox = document.getElementById('text-input') as HTMLElement;
 
-const user = [
-  new User('Brian', false, null),
-  new User('Brian', true, 'abc'),
-  new User('Brian', true, '123'),
-];
+// streams
+// const click$ = fromEvent(document, 'click');
+const input$ = fromEvent(inputBox, 'keyup');
 
-const state$ = from(user).pipe(
-  scan((accumulator, currentValue) => {
-    return { ...accumulator, ...currentValue };
-  }, new User()),
-);
-
-const name$ = state$.pipe(
-  distinctUntilKeyChanged('name'),
-  map((state: any) => state.name),
-);
-
-name$.subscribe(console.log);
+input$
+  // debounceTime(1000) is the same as debounce( () => interval(1000) )
+  .pipe(debounceTime(1000), pluck('target', 'value'), distinctUntilChanged())
+  .subscribe(console.log);

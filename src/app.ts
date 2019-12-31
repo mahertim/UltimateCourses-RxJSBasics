@@ -1,17 +1,26 @@
-import { of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { fromEvent } from 'rxjs';
+import { map, first } from 'rxjs/operators';
 
-const numbers$ = of(1, 2, 3, 4, 5);
+const click$ = fromEvent(document, 'click');
 
-numbers$
+click$
   .pipe(
-    tap(value => console.log('before', value)),
-    map(value => value * 10),
-    tap({
-      next: value => console.log('after', value),
-      complete: () => console.log('done!'),
+    map(event => {
+      if (event instanceof MouseEvent) {
+        return {
+          x: event.clientX,
+          y: event.clientY,
+        };
+      }
+      return {
+        x: 0,
+        y: 0,
+      };
     }),
+    // filter, take(1)
+    first(({ y }) => y > 200),
   )
-  .subscribe(value => {
-    console.log('from subscribe', value);
+  .subscribe({
+    next: console.log,
+    complete: () => console.log('complete'),
   });

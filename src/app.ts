@@ -1,12 +1,8 @@
-import { Observable, fromEvent } from 'rxjs';
-import { sampleTime, map } from 'rxjs/operators';
+import { Observable, fromEvent, interval } from 'rxjs';
+import { sample } from 'rxjs/operators';
 
 // streams
 const click$ = fromEvent(document, 'click') as Observable<MouseEvent>;
+const timer$ = interval(1000);
 
-click$
-  .pipe(
-    sampleTime(4000),
-    map(({ clientX, clientY }) => ({ clientX, clientY })),
-  )
-  .subscribe(console.log);
+timer$.pipe(sample(click$)).subscribe(console.log);

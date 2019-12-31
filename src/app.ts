@@ -1,5 +1,5 @@
 import { fromEvent } from 'rxjs';
-import { map, first } from 'rxjs/operators';
+import { map, takeWhile } from 'rxjs/operators';
 
 const click$ = fromEvent(document, 'click');
 
@@ -18,7 +18,7 @@ click$
       };
     }),
     // filter, take(1)
-    first(({ y }) => y > 200),
+    takeWhile(({ y }) => y <= 200),
   )
   .subscribe({
     next: console.log,

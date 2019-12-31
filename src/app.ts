@@ -1,26 +1,7 @@
-import { fromEvent } from 'rxjs';
-import { map, takeWhile } from 'rxjs/operators';
+import { interval, fromEvent } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
+const counter$ = interval(1000);
 const click$ = fromEvent(document, 'click');
 
-click$
-  .pipe(
-    map(event => {
-      if (event instanceof MouseEvent) {
-        return {
-          x: event.clientX,
-          y: event.clientY,
-        };
-      }
-      return {
-        x: 0,
-        y: 0,
-      };
-    }),
-    // filter, take(1)
-    takeWhile(({ y }) => y <= 200),
-  )
-  .subscribe({
-    next: console.log,
-    complete: () => console.log('complete'),
-  });
+counter$.pipe(takeUntil(click$)).subscribe(console.log);

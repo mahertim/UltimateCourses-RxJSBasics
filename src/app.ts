@@ -1,39 +1,30 @@
-import { fromEvent, timer } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
-import {
-  takeUntil,
-  tap,
-  finalize,
-  switchMapTo,
-  pluck,
-  exhaustMap,
-} from 'rxjs/operators';
+import { interval, fromEvent } from 'rxjs';
+import { scan, mapTo, takeWhile, takeUntil, startWith } from 'rxjs/operators';
 
-// helpers
-
-// elements
-const startButton = document.getElementById('start') as HTMLButtonElement;
-const stopButton = document.getElementById('stop') as HTMLButtonElement;
-const pollingStatus = document.getElementById(
-  'polling-status',
-) as HTMLButtonElement;
-const dogImage = document.getElementById('dog') as HTMLImageElement;
+// elem refs
+const countdown = document.getElementById('countdown');
+const message = document.getElementById('message');
+const abortButton = document.getElementById('abort');
 
 // streams
-const startClicks$ = fromEvent(startButton, 'click');
-const stopClicks$ = fromEvent(stopButton, 'click');
+const counter$ = interval(1000);
+const abort$ = fromEvent(abortButton, 'click');
 
-startClicks$
+const COUNTDOWN_FROM = 20;
+
+counter$
   .pipe(
-    exhaustMap(() =>
-      timer(0, 5000).pipe(
-        tap(() => (pollingStatus.innerHTML = 'Active')),
-        switchMapTo(
-          ajax.getJSON('https://random.dog/woof.json').pipe(pluck('url')),
-        ),
-        takeUntil(stopClicks$),
-        finalize(() => (pollingStatus.innerHTML = 'Stopped')),
-      ),
-    ),
+    mapTo(-1),
+    scan((accumulator, current) => {
+      return accumulator + current;
+    }, COUNTDOWN_FROM),
+    takeWhile(value => value >= 0),
+    takeUntil(abort$),
+    startWith(COUNTDOWN_FROM),
   )
-  .subscribe(url => (dogImage.src = url));
+  .subscribe((value: any) => {
+    countdown.innerHTML = value;
+    if (!value) {
+      message.innerHTML = 'Liftoff!';
+    }
+  });

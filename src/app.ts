@@ -1,21 +1,8 @@
-import { fromEvent, Observable } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
-import { map, mergeMap } from 'rxjs/operators';
+import { fromEvent, interval, Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 // streams
+const interval$ = interval(1000);
 const click$ = fromEvent(document, 'click') as Observable<MouseEvent>;
 
-const coordinates$ = click$.pipe(
-  map(event => ({
-    x: event.clientX,
-    y: event.clientY,
-  })),
-);
-
-const coordinatesWithSave$ = coordinates$.pipe(
-  mergeMap(coords =>
-    ajax.post('https://www.mocky.io/v2/5185415ba171ea3a00704eed', coords),
-  ),
-);
-
-coordinatesWithSave$.subscribe(console.log);
+click$.pipe(switchMap(() => interval$)).subscribe(console.log);

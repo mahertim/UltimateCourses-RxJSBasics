@@ -1,13 +1,19 @@
-import { interval, fromEvent } from 'rxjs';
-import { exhaustMap, take } from 'rxjs/operators';
+import { Observable, fromEvent } from 'rxjs';
+import { ajax, AjaxRequest } from 'rxjs/ajax';
+import { exhaustMap } from 'rxjs/operators';
 
-const interval$ = interval(1000);
-const click$ = fromEvent(document, 'click');
+// helpers
+const authenticateUser = (): Observable<AjaxRequest> => {
+  return ajax.post('https://regres.in/api/login', {
+    email: 'eve.holt@regres.in',
+    password: 'password',
+  });
+};
 
-click$
-  .pipe(
-    exhaustMap(() => {
-      return interval$.pipe(take(3));
-    }),
-  )
-  .subscribe(console.log);
+// elements
+const loginButton = document.getElementById('login') as HTMLButtonElement;
+
+// streams
+const login$ = fromEvent(loginButton, 'click') as Observable<MouseEvent>;
+
+login$.pipe(exhaustMap(() => authenticateUser())).subscribe(console.log);

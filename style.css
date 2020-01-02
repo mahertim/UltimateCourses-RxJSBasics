@@ -65,23 +65,14 @@ body {
   top: 6px;
 }
 
-#countdown {
-  margin-top: 20px;
-  font-size: 32px;
+.calculator-wrapper {
+  padding: 16px;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
-#start,
-#pause {
-  color: white;
-  border-radius: 4px;
-  padding: 8px 16px;
-  margin-top: 10px;
-}
-
-#pause {
-  background: red;
-}
-
-#start {
-  background: green;
+.form-wrapper {
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
 }

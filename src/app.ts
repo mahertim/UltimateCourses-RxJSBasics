@@ -1,11 +1,47 @@
-import { forkJoin } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
+import { combineLatest, fromEvent, of } from 'rxjs';
+import { map, filter, delay, mergeMap, tap, share } from 'rxjs/operators';
+import { calculateMortgage } from './helpers';
+
+// elements
+const loanAmount = document.getElementById('loanAmount') as HTMLInputElement;
+const interest = document.getElementById('interest') as HTMLInputElement;
+const loanLength = document.querySelectorAll('.loanLength') as NodeListOf<
+  HTMLInputElement
+>;
+const expected = document.getElementById('expected') as HTMLElement;
 
 // helpers
-const GITHUB_API_BASE = 'https://api.github.com';
+const createInputValueStream = (
+  elem: HTMLInputElement | NodeListOf<HTMLInputElement>,
+) => {
+  return fromEvent(elem, 'input').pipe(
+    map(event =>
+      parseFloat(((event as KeyboardEvent).target as HTMLInputElement).value),
+    ),
+  );
+};
+
+const saveResponse = (mortgageAmount: string) => {
+  // simulate sending to logging server
+  return of(mortgageAmount).pipe(delay(1000));
+};
 
 // streams
-const user$ = ajax.getJSON(`${GITHUB_API_BASE}/users/reactivex`);
-const repo$ = ajax.getJSON(`${GITHUB_API_BASE}/users/reactivex/repos`);
+const interest$ = createInputValueStream(interest);
+const loanLength$ = createInputValueStream(loanLength);
+const loanAmount$ = createInputValueStream(loanAmount);
 
-forkJoin(user$, repo$).subscribe(console.log);
+const calculation$ = combineLatest(interest$, loanAmount$, loanLength$).pipe(
+  map(([interest, loanAmount, loanLength]) => {
+    return calculateMortgage(interest, loanAmount, loanLength);
+  }),
+  tap(console.log), // prove calculation only happens once
+  filter(mortgageAmount => !isNaN(parseFloat(mortgageAmount))),
+  share(),
+);
+
+calculation$.subscribe(mortgageAmount => (expected.innerHTML = mortgageAmount));
+
+calculation$
+  .pipe(mergeMap(mortgageAmount => saveResponse(mortgageAmount)))
+  .subscribe();

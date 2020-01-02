@@ -1,37 +1,39 @@
-import { fromEvent, empty } from 'rxjs';
+import { fromEvent, timer } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import {
-  debounceTime,
+  takeUntil,
+  tap,
+  finalize,
+  switchMapTo,
   pluck,
-  distinctUntilChanged,
-  switchMap,
-  catchError,
+  exhaustMap,
 } from 'rxjs/operators';
 
-const BASE_URL = 'https://api.openbrewerydb.org/breweries';
-const typeaheadContainer = document.getElementById(
-  'typeahead-container',
-) as HTMLElement;
+// helpers
 
 // elements
-const inputBox = document.getElementById('text-input') as HTMLElement;
+const startButton = document.getElementById('start') as HTMLButtonElement;
+const stopButton = document.getElementById('stop') as HTMLButtonElement;
+const pollingStatus = document.getElementById(
+  'polling-status',
+) as HTMLButtonElement;
+const dogImage = document.getElementById('dog') as HTMLImageElement;
 
 // streams
-const input$ = fromEvent(inputBox, 'keyup');
+const startClicks$ = fromEvent(startButton, 'click');
+const stopClicks$ = fromEvent(stopButton, 'click');
 
-input$
+startClicks$
   .pipe(
-    debounceTime(200),
-    pluck('target', 'value'),
-    distinctUntilChanged(),
-    switchMap(searchTerm =>
-      ajax.getJSON(`${BASE_URL}?by_name=${searchTerm}`).pipe(
-        catchError((_error, _caught) => {
-          return empty();
-        }),
+    exhaustMap(() =>
+      timer(0, 5000).pipe(
+        tap(() => (pollingStatus.innerHTML = 'Active')),
+        switchMapTo(
+          ajax.getJSON('https://random.dog/woof.json').pipe(pluck('url')),
+        ),
+        takeUntil(stopClicks$),
+        finalize(() => (pollingStatus.innerHTML = 'Stopped')),
       ),
     ),
   )
-  .subscribe((response: any[]) => {
-    typeaheadContainer.innerHTML = response.map(b => b.name).join('<br>');
-  });
+  .subscribe(url => (dogImage.src = url));

@@ -1,17 +1,21 @@
-import { fromEvent, interval, Observable } from 'rxjs';
+import { Observable, of, fromEvent } from 'rxjs';
 // import { ajax } from 'rxjs/ajax';
-import { concatMap, take } from 'rxjs/operators';
+import { delay, concatMap } from 'rxjs/operators';
+
+// helpers
+const saveAnswer = (answer: string): Observable<string> => {
+  // simulate delayed request
+  return of(`Saved: ${answer}`).pipe(delay(1500));
+};
+
+// elements
+const radioButtons = document.querySelectorAll('.radio-option');
 
 // streams
-const interval$ = interval(1000) as Observable<number>;
-const click$ = fromEvent(document, 'click') as Observable<MouseEvent>;
+const answerChange$ = fromEvent(radioButtons, 'click');
 
-click$
+answerChange$
   .pipe(
-    concatMap(
-      (): Observable<number> => {
-        return interval$.pipe(take(3));
-      },
-    ),
+    concatMap(event => saveAnswer((event.target as HTMLInputElement).value)),
   )
   .subscribe(console.log);

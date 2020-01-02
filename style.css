@@ -70,10 +70,18 @@ body {
   font-size: 32px;
 }
 
-#abort {
-  background: red;
+#start,
+#pause {
   color: white;
   border-radius: 4px;
   padding: 8px 16px;
   margin-top: 10px;
+}
+
+#pause {
+  background: red;
+}
+
+#start {
+  background: green;
 }

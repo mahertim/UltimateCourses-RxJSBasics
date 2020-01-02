@@ -1,34 +1,17 @@
-import { fromEvent } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
-import {
-  debounceTime,
-  pluck,
-  distinctUntilChanged,
-  switchMap,
-} from 'rxjs/operators';
-
-const BASE_URL = 'https://api.openbrewerydb.org/breweries';
-const typeaheadContainer = document.getElementById(
-  'typeahead-container',
-) as HTMLElement;
-
-// elements
-const inputBox = document.getElementById('text-input') as HTMLElement;
+import { fromEvent, interval, Observable } from 'rxjs';
+// import { ajax } from 'rxjs/ajax';
+import { concatMap, take } from 'rxjs/operators';
 
 // streams
-const input$ = fromEvent(inputBox, 'keyup');
+const interval$ = interval(1000) as Observable<number>;
+const click$ = fromEvent(document, 'click') as Observable<MouseEvent>;
 
-input$
+click$
   .pipe(
-    debounceTime(200),
-    pluck('target', 'value'),
-    distinctUntilChanged(),
-    switchMap(searchTerm => {
-      return ajax.getJSON(`${BASE_URL}?by_name=${searchTerm}`);
-    }),
+    concatMap(
+      (): Observable<number> => {
+        return interval$.pipe(take(3));
+      },
+    ),
   )
-  .subscribe((response: any[]) => {
-    typeaheadContainer.innerHTML = response
-      .map((b: { name: any }) => b.name)
-      .join('<br>');
-  });
+  .subscribe(console.log);

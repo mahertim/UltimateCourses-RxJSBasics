@@ -1,19 +1,37 @@
-import { Observable, fromEvent } from 'rxjs';
-import { ajax, AjaxRequest } from 'rxjs/ajax';
-import { exhaustMap } from 'rxjs/operators';
+import { fromEvent, empty } from 'rxjs';
+import { ajax } from 'rxjs/ajax';
+import {
+  debounceTime,
+  pluck,
+  distinctUntilChanged,
+  switchMap,
+  catchError,
+} from 'rxjs/operators';
 
-// helpers
-const authenticateUser = (): Observable<AjaxRequest> => {
-  return ajax.post('https://regres.in/api/login', {
-    email: 'eve.holt@regres.in',
-    password: 'password',
-  });
-};
+const BASE_URL = 'https://api.openbrewerydb.org/breweries';
+const typeaheadContainer = document.getElementById(
+  'typeahead-container',
+) as HTMLElement;
 
 // elements
-const loginButton = document.getElementById('login') as HTMLButtonElement;
+const inputBox = document.getElementById('text-input') as HTMLElement;
 
 // streams
-const login$ = fromEvent(loginButton, 'click') as Observable<MouseEvent>;
+const input$ = fromEvent(inputBox, 'keyup');
 
-login$.pipe(exhaustMap(() => authenticateUser())).subscribe(console.log);
+input$
+  .pipe(
+    debounceTime(200),
+    pluck('target', 'value'),
+    distinctUntilChanged(),
+    switchMap(searchTerm =>
+      ajax.getJSON(`${BASE_URL}?by_name=${searchTerm}`).pipe(
+        catchError((_error, _caught) => {
+          return empty();
+        }),
+      ),
+    ),
+  )
+  .subscribe((response: any[]) => {
+    typeaheadContainer.innerHTML = response.map(b => b.name).join('<br>');
+  });

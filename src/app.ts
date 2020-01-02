@@ -1,34 +1,32 @@
-import { interval, fromEvent, merge, empty } from 'rxjs';
-import { scan, mapTo, takeWhile, startWith, switchMap } from 'rxjs/operators';
+import { fromEvent, combineLatest, interval } from 'rxjs';
+import { map, filter, withLatestFrom } from 'rxjs/operators';
 
-// elem refs
-const countdown = document.getElementById('countdown');
-const message = document.getElementById('message');
-const pauseButton = document.getElementById('pause');
-const startButton = document.getElementById('start');
+// helpers
+const keyupAsValue = (elem: HTMLInputElement) => {
+  return fromEvent(elem, 'keyup').pipe(
+    map(
+      (event: KeyboardEvent) =>
+        (event.target as HTMLInputElement).valueAsNumber,
+    ),
+  );
+};
+
+// elements
+const first = document.getElementById('first') as HTMLInputElement;
+const second = document.getElementById('second') as HTMLInputElement;
 
 // streams
-const counter$ = interval(1000);
-const pauseClick$ = fromEvent(pauseButton, 'click');
-const startClick$ = fromEvent(startButton, 'click');
+const click$ = fromEvent(document, 'click');
 
-const COUNTDOWN_FROM = 20;
+click$.pipe(withLatestFrom(interval(1000))).subscribe(console.log);
 
-merge(startClick$.pipe(mapTo(true)), pauseClick$.pipe(mapTo(false)))
+combineLatest(keyupAsValue(first), keyupAsValue(second))
   .pipe(
-    switchMap(shouldStart => {
-      return shouldStart ? counter$ : empty();
+    filter(([first, second]) => {
+      return !isNaN(first) && !isNaN(second);
     }),
-    mapTo(-1),
-    scan((accumulator, current) => {
-      return accumulator + current;
-    }, COUNTDOWN_FROM),
-    takeWhile(value => value >= 0),
-    startWith(COUNTDOWN_FROM),
+    map(([first, second]) => {
+      return first + second;
+    }),
   )
-  .subscribe((value: any) => {
-    countdown.innerHTML = value;
-    if (!value) {
-      message.innerHTML = 'Liftoff!';
-    }
-  });
+  .subscribe(console.log);
